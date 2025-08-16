@@ -1,55 +1,94 @@
--- creator.lua
-local Creator = {}
 
--- Function to create a new UI element
-function Creator.New(class, props, children)
-    local obj = Instance.new(class)
-    for k, v in pairs(props) do
-        obj[k] = v
-    end
-    if children then
-        for _, child in pairs(children) do
-            child.Parent = obj
-        end
-    end
-    return obj
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local Creator = require(script:WaitForChild("Creator")) -- Your Creator module
+
+local Window = {}
+Window.__index = Window
+
+function Window.new(Title, Properties)
+    local self = setmetatable({}, Window)
+
+    self.Title = Title or "Window"
+    self.Properties = Properties or {}
+    self.Themes = Properties.Themes or {
+        Dark = {
+            Background = "#1E1E2E",
+            TitleBar = "#292A3E",
+            Text = "#FFFFFF",
+        },
+        Light = {
+            Background = "#FFFFFF",
+            TitleBar = "#F0F0F0",
+            Text = "#000000",
+        }
+    }
+    self.Theme = Properties.Theme or self.Themes.Dark
+    self.Position = Properties.Position or UDim2.new(0.3,0,0.3,0)
+    self.Size = Properties.Size or UDim2.new(0,400,0,300)
+    
+    -- Main window
+    self.Frame = Creator.NewRoundFrame(15, "Squircle", {
+        Size = self.Size,
+        Position = self.Position,
+        BackgroundColor3 = Color3.fromHex(self.Theme.Background),
+    })
+    self.Frame.Name = "MainWindow"
+    
+    -- Title bar
+    self.TitleBar = Creator.NewRoundFrame(15, "Squircle", {
+        Size = UDim2.new(1,0,0,35),
+        BackgroundColor3 = Color3.fromHex(self.Theme.TitleBar),
+    }, nil, true)
+    self.TitleBar.Parent = self.Frame
+    
+    self.TitleLabel = Creator.New("TextLabel", {
+        Text = self.Title,
+        Size = UDim2.new(1,0,1,0),
+        TextColor3 = Color3.fromHex(self.Theme.Text),
+        BackgroundTransparency = 1,
+        TextScaled = true,
+        FontFace = Font.new("rbxassetid://12187365364")
+    })
+    self.TitleLabel.Parent = self.TitleBar
+    
+    -- Content container
+    self.Content = Creator.NewRoundFrame(15, "Squircle", {
+        Size = UDim2.new(1, -10, 1, -45),
+        Position = UDim2.new(0,5,0,40),
+        BackgroundColor3 = Color3.fromHex(self.Theme.Background),
+    })
+    self.Content.Parent = self.Frame
+    
+    -- Make draggable
+    self.DragModule = Creator.Drag(self.Frame, {self.TitleBar})
+    
+    -- Add to player's GUI
+    self.ScreenGui = Creator.New("ScreenGui", {
+        ResetOnSpawn = false
+    })
+    self.Frame.Parent = self.ScreenGui
+    self.ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    return self
 end
 
--- Function to make a frame draggable
-function Creator.Drag(frame)
-    local UserInputService = game:GetService("UserInputService")
-    local dragging, dragInput, dragStart, startPos
-
-    local function update(input)
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = frame.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
-    end)
+function Window:SetTheme(theme)
+    self.Theme = theme
+    self.Frame.BackgroundColor3 = Color3.fromHex(theme.Background)
+    self.TitleBar.BackgroundColor3 = Color3.fromHex(theme.TitleBar)
+    self.TitleLabel.TextColor3 = Color3.fromHex(theme.Text)
+    self.Content.BackgroundColor3 = Color3.fromHex(theme.Background)
 end
 
-return Creator
+function Window:AddChild(child)
+    child.Parent = self.Content
+end
+
+function Window:Destroy()
+    self.ScreenGui:Destroy()
+end
+
+return Window
