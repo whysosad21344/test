@@ -1,0 +1,37 @@
+-- Load Creator module via URL
+local Creator = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/CreatorModule.lua"))()
+
+-- Create main ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Create main window
+local MainWindow = Creator.New("Frame", {
+    Size = UDim2.new(0, 300, 0, 200),
+    Position = UDim2.new(0.5, -150, 0.5, -100),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+})
+MainWindow.Parent = ScreenGui
+
+-- Make window draggable
+Creator.Drag(MainWindow)
+
+-- Add toggle button
+local ToggleButton = Creator.New("TextButton", {
+    Size = UDim2.new(0, 100, 0, 50),
+    Position = UDim2.new(0.5, -50, 0.5, -25),
+    BackgroundColor3 = Color3.fromRGB(70, 70, 70),
+    Text = "OFF",
+    TextColor3 = Color3.new(1,1,1),
+    TextSize = 20,
+})
+ToggleButton.Parent = MainWindow
+
+-- Toggle functionality
+local toggled = false
+ToggleButton.MouseButton1Click:Connect(function()
+    toggled = not toggled
+    ToggleButton.Text = toggled and "ON" or "OFF"
+    ToggleButton.BackgroundColor3 = toggled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(70, 70, 70)
+end)
