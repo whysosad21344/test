@@ -9,14 +9,20 @@ Creator.SetTheme({
     ButtonHover = "#0277bd"
 })
 
+-- Create a ScreenGui first
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
 -- Create a main window
 local MainFrame = Creator.New("Frame", {
     Size = UDim2.new(0, 400, 0, 300),
-    Position = UDim2.new(0.5, -200, 0.5, -150),
-    BackgroundColor3 = Creator.Theme.Background
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.new(0.5, 0, 0.5, 0),
+    BackgroundColor3 = Creator.Theme.Background,
+    BorderSizePixel = 0
 })
-
-MainFrame.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+MainFrame.Parent = ScreenGui
 
 -- Add a title
 local Title = Creator.New("TextLabel", {
@@ -27,7 +33,6 @@ local Title = Creator.New("TextLabel", {
     TextColor3 = Creator.Theme.TextColor,
     Font = Enum.Font.GothamBold
 })
-
 Title.Parent = MainFrame
 
 -- Add a button
@@ -40,7 +45,6 @@ local MyButton = Creator.New("TextButton", {
     AutoButtonColor = true,
     Font = Enum.Font.Gotham
 })
-
 MyButton.Parent = MainFrame
 
 -- Button hover effect
