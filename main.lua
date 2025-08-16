@@ -1,4 +1,4 @@
--- Load the Creator module
+-- Load Creator module from GitHub
 local Creator = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/whysosad21344/test/main/Creator.lua"))()
 
 -- Set a nice theme
@@ -16,7 +16,6 @@ local MainFrame = Creator.New("Frame", {
     Position = UDim2.new(0.5, -200, 0.5, -150),
     BackgroundColor3 = Color3.fromHex("#1e1e2f")
 })
-
 MainFrame.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Add a title
@@ -27,8 +26,7 @@ local Title = Creator.New("TextLabel", {
     TextSize = 24,
     TextColor3 = Color3.fromHex("#ffffff"),
     Font = Enum.Font.GothamBold
-}, {})
-
+})
 Title.Parent = MainFrame
 
 -- Add a button
@@ -40,8 +38,7 @@ local MyButton = Creator.New("TextButton", {
     TextColor3 = Color3.fromHex("#ffffff"),
     AutoButtonColor = true,
     Font = Enum.Font.Gotham
-}, {})
-
+})
 MyButton.Parent = MainFrame
 
 -- Button hover effect
@@ -58,13 +55,3 @@ MyButton.MouseButton1Click:Connect(function()
         game:GetService("Players").LocalPlayer:Kick("You clicked the button!")
     end)
 end)
-
--- Add a small icon using the Creator Icon module
-local Icon = Creator.New("ImageLabel", {
-    Size = UDim2.new(0, 32, 0, 32),
-    Position = UDim2.new(0, 10, 0, 10),
-    BackgroundTransparency = 1,
-    Image = Creator.Icon("lucide-star")[1]
-})
-
-Icon.Parent = MainFrame
