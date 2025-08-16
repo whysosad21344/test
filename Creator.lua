@@ -1,55 +1,65 @@
 -- Creator.lua
 local Creator = {}
-Creator.__index = Creator
 
--- Helper to convert hex to Color3
-function Creator.HexColor(hex)
-    hex = hex:gsub("#","")
-    return Color3.fromRGB(
-        tonumber("0x"..hex:sub(1,2)),
-        tonumber("0x"..hex:sub(3,4)),
-        tonumber("0x"..hex:sub(5,6))
-    )
-end
+-- Table to store windows
+Creator.Windows = {}
 
--- Create a window
+-- Function to create a new window
 function Creator:CreateWindow(options)
     local Window = {}
-    Window.Title = options.Title or "Window"
-    Window.Footer = options.Footer or ""
-    Window.Frame = Instance.new("Frame")
-    Window.Frame.Size = UDim2.new(0, 400, 0, 300)
-    Window.Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-    Window.Frame.BackgroundColor3 = Creator.HexColor("#1e1e2f")
-    Window.Frame.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
+    
+    local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Main frame
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0, 400, 0, 300)
+    Frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 47)
+    Frame.Parent = PlayerGui
+    
     -- Title
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Text = Window.Title
-    TitleLabel.Size = UDim2.new(1, 0, 0, 50)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.TextColor3 = Color3.fromRGB(255,255,255)
-    TitleLabel.TextSize = 24
-    TitleLabel.Font = Enum.Font.GothamBold
-    TitleLabel.Parent = Window.Frame
-
-    Window:AddButton = function(self, buttonOptions)
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.BackgroundTransparency = 1
+    Title.Text = options.Title or "Window"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 24
+    Title.Font = Enum.Font.GothamBold
+    Title.Parent = Frame
+    
+    -- Store buttons for this window
+    Window.Buttons = {}
+    Window.Frame = Frame
+    
+    -- Add a button function
+    function Window:AddButton(buttonOptions)
         local Btn = Instance.new("TextButton")
-        Btn.Text = buttonOptions.Text or "Button"
         Btn.Size = UDim2.new(0, 120, 0, 40)
-        Btn.Position = UDim2.new(0.5, -60, 0.5, -20)
-        Btn.BackgroundColor3 = Creator.HexColor("#039be5")
-        Btn.TextColor3 = Color3.fromRGB(255,255,255)
+        Btn.Position = UDim2.new(0.5, -60, 0.5, -20 + (#self.Buttons * 50))
+        Btn.BackgroundColor3 = Color3.fromRGB(3, 155, 229)
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.Text = buttonOptions.Text or "Button"
         Btn.Font = Enum.Font.Gotham
-        Btn.Parent = Window.Frame
-
-        Btn.MouseButton1Click:Connect(function()
-            if buttonOptions.Callback then
-                buttonOptions.Callback()
-            end
+        Btn.TextSize = 18
+        Btn.Parent = self.Frame
+        
+        -- Button hover effect
+        Btn.MouseEnter:Connect(function()
+            Btn.BackgroundColor3 = Color3.fromRGB(2, 119, 189)
         end)
+        Btn.MouseLeave:Connect(function()
+            Btn.BackgroundColor3 = Color3.fromRGB(3, 155, 229)
+        end)
+        
+        -- Button click callback
+        if buttonOptions.Callback then
+            Btn.MouseButton1Click:Connect(buttonOptions.Callback)
+        end
+        
+        table.insert(self.Buttons, Btn)
     end
-
+    
+    table.insert(self.Windows, Window)
     return Window
 end
 
